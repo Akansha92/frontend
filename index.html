@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Homepage with Instagram Features</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        /* Global Styles */
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #ffffff; /* Changed to white for better contrast */
+            color: #333333; /* Darkened the text for readability */
+            overflow-x: hidden;
+        }
+
+        /* Intro Screen */
+        .intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            color: #fff;
+            z-index: 1000;
+            overflow: hidden;background: rgba(0, 0, 0, 0.7); /* Added semi-transparent black overlay for better text contrast */
+            color: #ffffff;
+            
+        }
+
+        .video-background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: -1;
+            
+        }
+
+        .intro-logo {
+            font-size: 3rem;
+            font-weight: bold;
+            animation: fadeIn 1.5s ease-out forwards;
+            font-family: "Lucida Handwriting", cursive;
+            
+        }
+
+        .intro-tagline {
+            margin-top: 1rem;
+            font-size: 1.5rem;
+            animation: fadeIn 2s ease-out 1s forwards;
+            opacity: 0;
+            font-family: "Segoe Script";
+        }
+
+        .intro-button {
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            font-size: 1.2rem;
+            color: #000;
+            background: #fff;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: fadeIn 2.5s ease-out 1.5s forwards;
+            opacity: 0;
+            
+        }
+
+        .intro-button:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+
+        /* Homepage Styles */
+        .homepage {
+            opacity: 0;
+            transform: translateY(50px);
+            transition: opacity 1s ease, transform 1s ease;
+        }
+
+        .homepage.loaded {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        header {
+            background: #fff;
+            border-bottom: 1px solid #ddd;
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            color: #333;
+        }
+
+        .content {
+            padding: 2rem;
+            text-align: center;
+        }
+
+        .content h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .content p {
+            font-size: 1.2rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Instagram-like Photo Grid */
+        .photo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            padding: 2rem;
+        }
+
+        .photo-grid img {
+            width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .photo-grid img:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Video Scrolling Section */
+        .video-scrolling-section {
+            padding: 2rem;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #333;
+        }
+
+        .video-container {
+            display: flex;
+            overflow-x: scroll;
+            scroll-snap-type: x mandatory;
+            gap: 10px;
+            padding: 1rem;
+        }
+
+        .video-card {
+            flex: 0 0 300px; /* Width of each video card */
+            scroll-snap-align: center;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .video-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.4);
+        }
+
+        video {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <!-- Intro Screen -->
+    <div class="intro-screen" id="introScreen">
+        <video class="video-background" autoplay muted loop>
+            <source src="video-background.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="intro-logo">BloomScroll</div>
+        <div class="intro-tagline">Empower Your Day, One Scroll at a Time.</div>
+        <button class="intro-button" onclick="startHomepage()">Get Started</button>
+    </div>
+  
+    <!-- Homepage -->
+    <div class="welcome-section">
+        <video autoplay loop muted class="background-video">
+            <source src="video.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+        <div class="welcome-content">
+            <h1 class="welcome-text">Welcome to BloomScroll</h1>
+            <p class="description">A platform to inspire and connect with the community.</p>
+        </div>
+    </div>
+    
+    <style>
+        /* Full-screen background video */
+        .welcome-section {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+    
+        .background-video {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the video covers the entire section */
+            z-index: -1; /* Places the video behind the content */
+        }
+    
+        /* Text content on top of the video */
+        .welcome-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            color: white; /* White text for contrast */
+            padding: 20px;
+        }
+    
+        .welcome-text {
+            font-size: 3rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+    
+        .description {
+            font-size: 1.25rem;
+            margin-top: 10px;
+        }
+    </style>
+    
+        
+        
+        <div class="photo-grid">
+            <!-- Instagram-like Photos -->
+            <img src="photo1.jpg" alt="Photo 1" loading="lazy">
+            <img src="photo2.jpg" alt="Photo 2" loading="lazy">
+            <img src="photo3.jpg" alt="Photo 3" loading="lazy">
+            <img src="photo4.jpg" alt="Photo 4" loading="lazy">
+            <img src="photo5.jpg" alt="Photo 5" loading="lazy">
+        </div>
+    </div>
+
+    <script>
+        function startHomepage() {
+            const introScreen = document.getElementById('introScreen');
+            const homepage = document.getElementById('homepage');
+
+            introScreen.style.display = 'none';
+            homepage.classList.add('loaded');
+        }
+        
+        // Automatically start homepage after 5 seconds
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                startHomepage();
+            }, 5000);
+        });
+    </script>
+
+    <!-- Video Scrolling Section -->
+    <div class="video-scrolling-section">
+        <h2 class="section-title">Scroll Through Stories That Move You</h2>
+        <div class="video-container">
+            <div class="video-card">
+                <video src="video1.mp4" muted autoplay loop></video>
+            </div>
+            <div class="video-card">
+                <video src="video2.mp4" muted autoplay loop></video>
+            </div>
+            <div class="video-card">
+                <video src="video3.mp4" muted autoplay loop></video>
+            </div>
+            <div class="video-card">
+                <video src="video4.mp4" muted autoplay loop></video>
+            </div>
+            <div class="video-card">
+                <video src="video5.mp4" muted autoplay loop></video>
+            </div>
+            <div class="video-card">
+                <video src="video6.mp4" muted autoplay loop></video>
+            </div>
+        </div>
+    </div>
+    <div class="featured-stories">
+        <h2 class="section-title">Featured Stories</h2>
+        <p class="section-description">
+            Discover inspiring moments and incredible stories from our community. Click to explore more!
+        </p>
+        <div class="story-grid">
+            <div class="story-card">
+                <img src="story1.png" alt="Story 1">
+                <div class="story-content">
+                    <h3>Overcoming Challenges</h3>
+                    <p>Learn how Alex transformed setbacks into success and found his passion.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+            <div class="story-card">
+                <img src="story2.jpg" alt="Story 2">
+                <div class="story-content">
+                    <h3>Community Impact</h3>
+                    <p>Explore the inspiring story of how one community rallied to make a difference.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+            <div class="story-card">
+                <img src="story3.jpg" alt="Story 3">
+                <div class="story-content">
+                    <h3>Finding Purpose</h3>
+                    <p>Discover Maria's journey of self-discovery and her path to fulfillment.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </div>
+            </div>
+            <!-- Add more story cards as needed -->
+        </div>
+    </div>
+    <style>
+        .featured-stories {
+            padding: 2rem;
+            background-color: #f9f9f9;
+            text-align: center;
+        }
+    
+        .featured-stories .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+    
+        .featured-stories .section-description {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            color: #666;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    
+        .story-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+    
+        .story-card {
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+    
+        .story-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+    
+        .story-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+    
+        .story-content {
+            padding: 1rem;
+            text-align: left;
+        }
+    
+        .story-content h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #333;
+        }
+    
+        .story-content p {
+            font-size: 1rem;
+            color: #666;
+            margin-bottom: 1rem;
+        }
+    
+        .story-content .read-more {
+            display: inline-block;
+            font-size: 1rem;
+            color: #007BFF;
+            text-decoration: none;
+            border-bottom: 1px solid #007BFF;
+            transition: color 0.3s, border-bottom-color 0.3s;
+        }
+    
+        .story-content .read-more:hover {
+            color: #0056b3;
+            border-bottom-color: #0056b3;
+        }
+    </style>
+        
+        <div class="event-section">
+            <h2 class="event-title">Upcoming Event</h2>
+            <p class="event-description">
+                Don’t miss our live webinar on <strong>[Date]</strong>. Join us to explore new opportunities and insights!
+            </p>
+            <div id="countdown" class="countdown-timer"></div>
+            <a href="#" class="register-button">Register Now</a>
+        </div>
+        <style>
+            .event-section {
+                padding: 3rem;
+                background-color: #f9f9f9;
+                text-align: center;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin: 2rem auto;
+                max-width: 800px;
+            }
+        
+            .event-title {
+                font-size: 2.5rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+        
+            .event-description {
+                font-size: 1.2rem;
+                color: #555;
+                margin-bottom: 2rem;
+            }
+        
+            #countdown {
+                font-size: 1.5rem;
+                color: #007BFF;
+                font-weight: bold;
+                margin-bottom: 2rem;
+            }
+        
+            .register-button {
+                display: inline-block;
+                padding: 1rem 2rem;
+                font-size: 1.2rem;
+                background-color: #007BFF;
+                color: #fff;
+                text-decoration: none;
+                border-radius: 25px;
+                box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+                transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            }
+        
+            .register-button:hover {
+                background-color: #0056b3;
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+        </style>
+        
+        <script>
+            function startCountdown(targetDate) {
+                const countdownElement = document.getElementById('countdown');
+        
+                function updateCountdown() {
+                    const now = new Date();
+                    const timeLeft = targetDate - now;
+        
+                    if (timeLeft <= 0) {
+                        clearInterval(interval);
+                        countdownElement.textContent = "The event has started!";
+                        return;
+                    }
+        
+                    const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                    const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                    const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+        
+                    countdownElement.textContent = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+                }
+        
+                const interval = setInterval(updateCountdown, 1000);
+                updateCountdown(); // Initial call to avoid 1-second delay
+            }
+        
+            // Set the target event date (e.g., January 31, 2025, at 6:00 PM)
+            const eventDate = new Date('2025-01-31T18:00:00');
+            startCountdown(eventDate);
+        </script>
+        
+        <div class="achievements-section">
+            <h2 class="achievements-title">Your Achievements</h2>
+            <p class="achievements-description">Celebrate your journey with our special badges. Keep scrolling, contributing, and shining!</p>
+            <div class="badge-grid">
+                <div class="badge">
+                    <span class="badge-icon">🌟</span>
+                    <h3 class="badge-title">Consistent Scroller</h3>
+                    <p class="badge-description">Awarded for being an active and regular user of our platform.</p>
+                </div>
+                <div class="badge">
+                    <span class="badge-icon">🏆</span>
+                    <h3 class="badge-title">Community Contributor</h3>
+                    <p class="badge-description">Recognized for making meaningful contributions to our community.</p>
+                </div>
+                <!-- Add more badges as needed -->
+            </div>
+        </div>
+        <style>
+            .achievements-section {
+                padding: 3rem;
+                background-color: #f9f9f9;
+                text-align: center;
+                border-radius: 10px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                margin: 2rem auto;
+                max-width: 900px;
+            }
+        
+            .achievements-title {
+                font-size: 2.5rem;
+                color: #333;
+                margin-bottom: 1rem;
+            }
+        
+            .achievements-description {
+                font-size: 1.2rem;
+                color: #555;
+                margin-bottom: 2rem;
+            }
+        
+            .badge-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 20px;
+                justify-items: center;
+            }
+        
+            .badge {
+                background: linear-gradient(135deg, #ffafbd, #ffc3a0);
+                color: #fff;
+                text-align: center;
+                padding: 2rem 1.5rem;
+                border-radius: 15px;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                transition: transform 0.3s, box-shadow 0.3s;
+                position: relative;
+                overflow: hidden;
+            }
+        
+            .badge:hover {
+                transform: scale(1.05);
+                box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+            }
+        
+            .badge-icon {
+                font-size: 3rem;
+                margin-bottom: 1rem;
+                display: inline-block;
+                background: rgba(255, 255, 255, 0.2);
+                padding: 0.5rem;
+                border-radius: 50%;
+            }
+        
+            .badge-title {
+                font-size: 1.5rem;
+                margin: 0.5rem 0;
+                font-weight: bold;
+            }
+        
+            .badge-description {
+                font-size: 1rem;
+                color: #f8f8f8;
+            }
+        </style>
+                
+    
+                <div class="testimonials-section">
+                    <h2 class="testimonials-title">What People Are Saying</h2>
+                    <p class="testimonials-subtitle">Hear from our vibrant community of users who are inspired daily.</p>
+                    <div class="testimonial-carousel">
+                        <div class="testimonial">
+                            <p class="testimonial-text">"BloomScroll transformed my mornings with its positivity!"</p>
+                            <span class="testimonial-author">- User A</span>
+                        </div>
+                        <div class="testimonial">
+                            <p class="testimonial-text">"I found a supportive community that inspires me every day."</p>
+                            <span class="testimonial-author">- User B</span>
+                        </div>
+                        <div class="testimonial">
+                            <p class="testimonial-text">"The best platform to connect, learn, and grow together!"</p>
+                            <span class="testimonial-author">- User C</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <footer class="site-footer">
+                    <h2 class="footer-title">Join the Movement</h2>
+                    <p class="footer-text">Stay connected and inspired. Be a part of the BloomScroll community today.</p>
+                    <div class="footer-buttons">
+                        <button class="subscribe-btn">Subscribe</button>
+                        <button class="download-btn">Download App</button>
+                    </div>
+                    <p class="footer-note">&copy; 2025 BloomScroll. All rights reserved.</p>
+                </footer>
+                <style>
+                    /* Testimonials Section */
+                    .testimonials-section {
+                        padding: 3rem;
+                        background-color: #f9f9f9;
+                        text-align: center;
+                        border-radius: 10px;
+                        margin: 2rem auto;
+                        max-width: 900px;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    }
+                
+                    .testimonials-title {
+                        font-size: 2.5rem;
+                        color: #333;
+                        margin-bottom: 1rem;
+                    }
+                
+                    .testimonials-subtitle {
+                        font-size: 1.2rem;
+                        color: #555;
+                        margin-bottom: 2rem;
+                    }
+                
+                    .testimonial-carousel {
+                        display: flex;
+                        overflow-x: auto;
+                        gap: 20px;
+                        scroll-snap-type: x mandatory;
+                        padding: 1rem;
+                    }
+                
+                    .testimonial {
+                        background: linear-gradient(135deg, #ffe29f, #ffa99f);
+                        color: #fff;
+                        flex: 0 0 300px;
+                        scroll-snap-align: center;
+                        border-radius: 15px;
+                        padding: 2rem;
+                        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                        text-align: left;
+                        transition: transform 0.3s, box-shadow 0.3s;
+                    }
+                
+                    .testimonial:hover {
+                        transform: scale(1.05);
+                        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+                    }
+                
+                    .testimonial-text {
+                        font-size: 1.2rem;
+                        margin-bottom: 1rem;
+                    }
+                
+                    .testimonial-author {
+                        font-size: 1rem;
+                        font-weight: bold;
+                        text-align: right;
+                        display: block;
+                    }
+                
+                    /* Footer */
+                    .site-footer {
+                        background: #333;
+                        color: #fff;
+                        text-align: center;
+                        padding: 2rem 1rem;
+                        border-top: 1px solid #444;
+                    }
+                
+                    .footer-title {
+                        font-size: 2rem;
+                        margin-bottom: 1rem;
+                    }
+                
+                    .footer-text {
+                        font-size: 1.2rem;
+                        margin-bottom: 2rem;
+                    }
+                
+                    .footer-buttons {
+                        display: flex;
+                        gap: 1rem;
+                        justify-content: center;
+                        margin-bottom: 1rem;
+                    }
+                
+                    .subscribe-btn, .download-btn {
+                        padding: 0.8rem 2rem;
+                        font-size: 1.2rem;
+                        border: none;
+                        border-radius: 25px;
+                        cursor: pointer;
+                        transition: background-color 0.3s, transform 0.3s;
+                    }
+                
+                    .subscribe-btn {
+                        background: #ff7f50;
+                        color: #fff;
+                    }
+                
+                    .download-btn {
+                        background: #1e90ff;
+                        color: #fff;
+                    }
+                
+                    .subscribe-btn:hover, .download-btn:hover {
+                        transform: scale(1.1);
+                    }
+                
+                    .footer-note {
+                        font-size: 0.9rem;
+                        color: #aaa;
+                        margin-top: 1rem;
+                    }
+                </style>
+                                
+    
+
+    <script>
+        // Optional: Add play/pause functionality on hover
+        const videos = document.querySelectorAll('.video-card video');
+
+        videos.forEach(video => {
+            video.addEventListener('mouseover', () => {
+                video.play();
+            });
+
+            video.addEventListener('mouseout', () => {
+                video.pause();
+            });
+        });
+    </script>
+</body>
+</html>
